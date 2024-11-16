@@ -4,6 +4,7 @@
     import Matching from "./Matching.svelte";
     import OneChoice from "./OneChoice.svelte";
     import { current_question } from "./shared.svelte";
+    import { base } from "$app/paths";
 
     let { question, total_questions, answer = $bindable(), submittable, reset_func }: { question: Question, total_questions: number, answer: Answer, submittable: boolean, reset_func: () => void } = $props()
 
@@ -56,7 +57,7 @@
         <h2>{question.question}</h2>
         {#if question.has_img}
         <!-- svelte-ignore a11y_missing_attribute -->
-        <img src={`/imgs/quiz${question.quiz_num}_q${question.question_num}.png`}>
+        <img src={`${base}/imgs/quiz${question.quiz_num}_q${question.question_num}.png`}>
         {/if}
     </div>
     <div id="QuestionBody">
