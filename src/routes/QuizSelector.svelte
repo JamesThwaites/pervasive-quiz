@@ -20,6 +20,8 @@
     'AI agents',
   ]
 
+  const { reset_func }: { reset_func: () => void } = $props();
+
   // Function to toggle the allowed state of a week
   function toggleWeek(week: number) {
 
@@ -118,7 +120,11 @@
     <button class='number-buttons' onclick={() => {selector.numberOfQuestions++}}>+</button>
   </div></h1>
   
-  <button class='begin-button' onclick={() => selector.quizBegun = true}>
+  <button class='begin-button' onclick={() => {
+        reset_func();
+        selector.quizBegun = true;
+      }
+    }>
     <h1>
       Begin Quiz
     </h1>

@@ -104,12 +104,12 @@
         })
     )
 
-    function resetQuiz(questionCount: number) {
+    function resetQuiz() {
         let allowedQuestions = data.questions.filter((question) => 
             selector.allowedWeeks.includes(question.quiz_num)
         );
         questions = genRandomSequence(
-            questionCount, 0, allowedQuestions.length
+            selector.numberOfQuestions, 0, allowedQuestions.length
         ).map((v) => allowedQuestions[v]);
 
         current_question.num = 0;
@@ -132,17 +132,11 @@
         });
     }
 
-    $effect(() => {
-        resetQuiz(selector.numberOfQuestions)
-    })
-
-    // $inspect(answers)
-
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
 <div id="Container">
     {#if selector.quizBegun === false}
-        <QuizSelector />
+        <QuizSelector reset_func={() => resetQuiz()} />
     {:else}
         <Progress progress={progress} />
         <QuestionCard 
