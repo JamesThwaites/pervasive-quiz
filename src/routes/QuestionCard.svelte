@@ -5,6 +5,7 @@
     import OneChoice from "./OneChoice.svelte";
     import { current_question } from "./shared.svelte";
     import { base } from "$app/paths";
+  import { quizBegun } from "./store"
 
     let { question, total_questions, answer = $bindable(), submittable, reset_func }: { question: Question, total_questions: number, answer: Answer, submittable: boolean, reset_func: () => void } = $props()
 
@@ -22,7 +23,6 @@
         reset_func()
     }
 
-    //$effect(() => console.log(question.question))
 </script>
 
 <div id="QuestionCard">
@@ -40,7 +40,7 @@
                 <input type=checkbox id="ShowCorrectCheck" bind:checked={show_answers}>
             </div>
             
-            <input type="submit" value="New Quiz" onclick={reset}>
+            <input type="submit" value="New Quiz" onclick={() => quizBegun.set(false)}>
             {:else}
             <input type="submit" value="Submit Quiz" disabled={!submittable} onclick={() => {submitted = true; current_question.num = 0;}}>
             {/if}
