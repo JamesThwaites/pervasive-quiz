@@ -1,12 +1,11 @@
 <script lang="ts">
     import { data, QuestionProgress, type Answer, type MatchingAnswer, type MatchingQuestion } from "$lib/data";
-  import { get } from "svelte/store"
+    import { get } from "svelte/store"
     import Progress from "./Progress.svelte";
     import QuestionCard from "./QuestionCard.svelte";
     import QuizSelector from "./QuizSelector.svelte"
     import { current_question } from "./shared.svelte";
     import { allowedWeeks, numberOfQuestions, quizBegun } from './store';
-  import { all } from "axios"
 
     function genRandomSequence(len: number, start: number, stop: number): Array<number> {
         const maxLimit = 200;
