@@ -6,7 +6,7 @@
     import { current_question, selector } from "./shared.svelte";
     import { base } from "$app/paths";
 
-    let { question, answer = $bindable(), submittable, reset_func }: { question: Question, answer: Answer, submittable: boolean, reset_func: () => void } = $props()
+    let { question, answer = $bindable(), submittable }: { question: Question, answer: Answer, submittable: boolean } = $props()
 
     let prev_disabled = $derived(current_question.num === 0)
     let next_disabled = $derived(current_question.num === selector.numberOfQuestions - 1)
@@ -16,11 +16,6 @@
     let show_answers = $state(false);
 
     $inspect(show_answers)
-
-    function reset() {
-        submitted = false
-        reset_func()
-    }
 
 </script>
 

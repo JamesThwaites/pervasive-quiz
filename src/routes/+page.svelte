@@ -148,7 +148,6 @@
         <QuestionCard 
             question={question}
             submittable={submittable}
-            reset_func={() => resetQuiz(selector.numberOfQuestions)}
             bind:answer={answers[current_question.num]}
         />
     {/if}
