@@ -3,13 +3,13 @@
     import ManyChoice from "./ManyChoice.svelte";
     import Matching from "./Matching.svelte";
     import OneChoice from "./OneChoice.svelte";
-    import { current_question } from "./shared.svelte";
+    import { current_question, selector } from "./shared.svelte";
     import { base } from "$app/paths";
 
-    let { question, total_questions, answer = $bindable(), submittable, reset_func }: { question: Question, total_questions: number, answer: Answer, submittable: boolean, reset_func: () => void } = $props()
+    let { question, answer = $bindable(), submittable }: { question: Question, answer: Answer, submittable: boolean } = $props()
 
     let prev_disabled = $derived(current_question.num === 0)
-    let next_disabled = $derived(current_question.num === total_questions - 1)
+    let next_disabled = $derived(current_question.num === selector.numberOfQuestions - 1)
 
     let submitted = $state(false);
 
@@ -17,12 +17,6 @@
 
     $inspect(show_answers)
 
-    function reset() {
-        submitted = false
-        reset_func()
-    }
-
-    //$effect(() => console.log(question.question))
 </script>
 
 <div id="QuestionCard">
@@ -40,7 +34,7 @@
                 <input type=checkbox id="ShowCorrectCheck" bind:checked={show_answers}>
             </div>
             
-            <input type="submit" value="New Quiz" onclick={reset}>
+            <input type="submit" value="New Quiz" onclick={() => selector.quizBegun = false}>
             {:else}
             <input type="submit" value="Submit Quiz" disabled={!submittable} onclick={() => {submitted = true; current_question.num = 0;}}>
             {/if}

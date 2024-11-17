@@ -2,9 +2,12 @@
     import { data, QuestionProgress, type Answer, type MatchingAnswer, type MatchingQuestion } from "$lib/data";
     import Progress from "./Progress.svelte";
     import QuestionCard from "./QuestionCard.svelte";
-    import { current_question } from "./shared.svelte";
+    import QuizSelector from "./QuizSelector.svelte"
+    import { current_question, selector } from "./shared.svelte";
 
     function genRandomSequence(len: number, start: number, stop: number): Array<number> {
+        const maxLimit = 200;
+        let current = 0;
         let seq: number[] = []
         let to_add: number
         let rand_in_range = () => Math.floor(Math.random() * (stop - start) + start)
@@ -12,18 +15,23 @@
             to_add = rand_in_range()
             while (seq.includes(to_add)) {
                 to_add = rand_in_range()
+                current++;
+                if (current > maxLimit){
+                    return seq;
+                }
             }
             seq.push(to_add)
+            
         }
         return seq
     }
 
-    let total_questions = 5;
     let questions = $state(genRandomSequence(
-        total_questions, 0, data.questions.length
+        selector.numberOfQuestions, 0, data.questions.length
     ).map((v) => data.questions[v]))
 
     let question = $derived(questions[current_question.num]);
+
 
     // svelte-ignore state_referenced_locally
     let answers: Answer[] = $state(questions.map((v) => {
@@ -48,11 +56,10 @@
     }))
 
     let submittable = $derived(
-        current_question.num === total_questions - 1 &&
+        current_question.num === selector.numberOfQuestions - 1 &&
         questions.every((v, i) => {
             switch (v.type) {
                 case "one_choice":
-                    console.log(answers[i])
                     return answers[i] !== "" ? true : false 
 
                 case "matching":
@@ -98,46 +105,47 @@
     )
 
     function resetQuiz() {
+        let allowedQuestions = data.questions.filter((question) => 
+            selector.allowedWeeks.includes(question.quiz_num)
+        );
         questions = genRandomSequence(
-            total_questions, 0, data.questions.length
-        ).map((v) => data.questions[v])
+            selector.numberOfQuestions, 0, allowedQuestions.length
+        ).map((v) => allowedQuestions[v]);
 
-        current_question.num = 0
+        current_question.num = 0;
 
         answers = questions.map((v) => {
-            switch (v.type) {
+            switch (v?.type) {
                 case "one_choice":
-                    return ""
-
+                    return "";
                 case "matching":
-                    v = v as MatchingQuestion
                     let answer_map: Record<string, string> = {};
-                    for (let i = 0; i < v.parts.length; i++) {
-                        answer_map[v.parts[i]] = ""
+                    for (let i = 0; i < (v as MatchingQuestion).parts.length; i++) {
+                        answer_map[(v as MatchingQuestion).parts[i]] = "";
                     }
-                    return answer_map
-
+                    return answer_map;
                 case "many_choice":
-                    return new Array<string>()
-
+                    return [];
                 default:
-                    return new Array<string>()
+                    return [];
             }
-        })
+        });
     }
-    // $inspect(answers)
 
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
 <div id="Container">
-    <Progress progress={progress} total_questions={total_questions} />
-    <QuestionCard 
-        question={question}
-        total_questions={total_questions}
-        submittable={submittable}
-        reset_func={resetQuiz}
-        bind:answer={answers[current_question.num]}
-    />
+    {#if selector.quizBegun === false}
+        <QuizSelector reset_func={() => resetQuiz()} />
+    {:else}
+        <Progress progress={progress} />
+        <QuestionCard 
+            question={question}
+            submittable={submittable}
+            bind:answer={answers[current_question.num]}
+        />
+    {/if}
+    
 </div>
 
 <style>

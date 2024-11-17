@@ -1,10 +1,10 @@
 <script lang="ts">
     import { QuestionProgress } from "$lib/data";
     import { tweened } from "svelte/motion";
-    import { current_question } from "./shared.svelte";
+    import { current_question, selector } from "./shared.svelte";
     import { cubicOut } from "svelte/easing";
 
-    let { total_questions, progress }: { total_questions: number, progress: QuestionProgress[] } = $props()
+    let { progress }: { progress: QuestionProgress[] } = $props()
     let range = (n: number) => [...Array(n).keys()]
 
     let trackball: HTMLDivElement;
@@ -20,7 +20,7 @@
 
 <div class="container">
     <div style:--left={$tb_pos} class="trackball" bind:this={trackball}></div>
-    {#each range(total_questions) as q_num}
+    {#each range(selector.numberOfQuestions) as q_num}
         <button class={progress[q_num] == QuestionProgress.COMPLETE ? "complete" : "incomplete"}
             onclick={() => current_question.num = q_num}
         >
