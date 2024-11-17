@@ -1,11 +1,9 @@
 <script lang="ts">
     import { data, QuestionProgress, type Answer, type MatchingAnswer, type MatchingQuestion } from "$lib/data";
-    import { get } from "svelte/store"
     import Progress from "./Progress.svelte";
     import QuestionCard from "./QuestionCard.svelte";
     import QuizSelector from "./QuizSelector.svelte"
-    import { current_question } from "./shared.svelte";
-    import { allowedWeeks, numberOfQuestions, quizBegun } from './store';
+    import { current_question, selector } from "./shared.svelte";
 
     function genRandomSequence(len: number, start: number, stop: number): Array<number> {
         const maxLimit = 200;
@@ -28,9 +26,8 @@
         return seq
     }
 
-    let total_questions = $state(5);
     let questions = $state(genRandomSequence(
-        total_questions, 0, data.questions.length
+        selector.numberOfQuestions, 0, data.questions.length
     ).map((v) => data.questions[v]))
 
     let question = $derived(questions[current_question.num]);
@@ -59,7 +56,7 @@
     }))
 
     let submittable = $derived(
-        current_question.num === total_questions - 1 &&
+        current_question.num === selector.numberOfQuestions - 1 &&
         questions.every((v, i) => {
             switch (v.type) {
                 case "one_choice":
@@ -109,7 +106,7 @@
 
     function resetQuiz(questionCount: number) {
         let allowedQuestions = data.questions.filter((question) => 
-            get(allowedWeeks).includes(question.quiz_num)
+            selector.allowedWeeks.includes(question.quiz_num)
         );
         questions = genRandomSequence(
             questionCount, 0, allowedQuestions.length
@@ -135,29 +132,23 @@
         });
     }
 
-    numberOfQuestions.subscribe(() => {
-            total_questions = get(numberOfQuestions)
-            resetQuiz($numberOfQuestions)
+    $effect(() => {
+        resetQuiz(selector.numberOfQuestions)
     })
 
-    allowedWeeks.subscribe(() => {
-        total_questions = get(numberOfQuestions)
-        resetQuiz($numberOfQuestions)
-    })
     // $inspect(answers)
 
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
 <div id="Container">
-    {#if $quizBegun === false}
+    {#if selector.quizBegun === false}
         <QuizSelector />
     {:else}
-        <Progress progress={progress} total_questions={total_questions} />
+        <Progress progress={progress} />
         <QuestionCard 
             question={question}
-            total_questions={total_questions}
             submittable={submittable}
-            reset_func={() => resetQuiz(total_questions)}
+            reset_func={() => resetQuiz(selector.numberOfQuestions)}
             bind:answer={answers[current_question.num]}
         />
     {/if}

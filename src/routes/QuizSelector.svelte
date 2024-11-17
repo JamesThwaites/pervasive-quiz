@@ -2,10 +2,8 @@
 
 
 <script lang="ts">
-  import { get } from 'svelte/store'
-
   // Define the initial state with all weeks allowed
-  import { numberOfQuestions, allowedWeeks, quizBegun } from './store';
+  import { selector } from './shared.svelte';
 
   const weekDescriptions = [
     'Introduction to pervasive computing', 
@@ -24,10 +22,10 @@
 
   // Function to toggle the allowed state of a week
   function toggleWeek(week: number) {
-    
-    allowedWeeks.update(weeks => {
+
+    selector.allowedWeeks = ((weeks: number[]) => {
       if (weeks.includes(week)) {
-        if ($allowedWeeks.length === 1){
+        if (selector.allowedWeeks.length === 1){
           return weeks; 
         }
         return weeks.filter(w => w !== week);
@@ -35,12 +33,12 @@
         // If week is not allowed, add it
         return [...weeks, week];
       }
-    });
+    })(selector.allowedWeeks);
   }
 
   // Helper function to determine button class
   function getButtonClass(week: number): string {
-    return $allowedWeeks.includes(week) ? 'allowed' : '';
+    return selector.allowedWeeks.includes(week) ? 'allowed' : '';
   }
 </script>
 
@@ -115,12 +113,12 @@
       </button>
   </div>
   <h1 class='question-title'>How many questions: <div class='number-button-wrapper'>
-    <button class='number-buttons {get(numberOfQuestions) === 1 && "disabled-button"}' onclick={() => {get(numberOfQuestions) > 1&& numberOfQuestions.update(n => n-1) }}>-</button>
-      {$numberOfQuestions}
-    <button class='number-buttons' onclick={() => {numberOfQuestions.update(n => n+1)}}>+</button>
+    <button class='number-buttons {selector.numberOfQuestions === 1 && "disabled-button"}' onclick={() => {selector.numberOfQuestions > 1 && selector.numberOfQuestions--}}>-</button>
+      {selector.numberOfQuestions}
+    <button class='number-buttons' onclick={() => {selector.numberOfQuestions++}}>+</button>
   </div></h1>
   
-  <button class='begin-button' onclick={() => quizBegun.update(()=>true)}>
+  <button class='begin-button' onclick={() => selector.quizBegun = true}>
     <h1>
       Begin Quiz
     </h1>
