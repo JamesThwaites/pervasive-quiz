@@ -1,6 +1,3 @@
-
-
-
 <script lang="ts">
   // Define the initial state with all weeks allowed
   import { selector } from './shared.svelte';
@@ -18,7 +15,10 @@
     'Voice and sound',
     'Eye tracking',
     'AI agents',
+    'Custom'
   ]
+
+  $inspect(selector.allowedWeeks)
 
   const { reset_func }: { reset_func: () => void } = $props();
 
@@ -99,17 +99,17 @@
 <div>
   <h1>Select Allowed Question Banks</h1>
   <div class='all-weeks'>
-    {#each Array(12) as _, week}
+    {#each Array(13) as _, week}
       <button
-        class="week-button {getButtonClass(week)}"
-        onclick={() => toggleWeek(week)}
+        class="week-button {getButtonClass(week + 1)}"
+        onclick={() => toggleWeek(week + 1)}
       >
         Week {week+1}:{weekDescriptions[week]}
       </button>
     {/each}
     <button
-        class="week-button {getButtonClass(12)} other-button"
-        onclick={() => toggleWeek(12)}
+        class="week-button {getButtonClass(14)} other-button"
+        onclick={() => toggleWeek(14)}
       >
         Others
       </button>
